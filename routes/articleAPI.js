@@ -7,7 +7,7 @@ router.post('/', async function(req, res, next) {
   let flag = true
   await sqlSearch('begin;')
   let articleCurrentId
-  if (req.body.id === 0) {
+  if (req.body.id === 0) {      // 新写的博客
     let sqlSentence5 = `select count(*) from ll_articles`
     let articleId = await sqlSearch(sqlSentence5)
     articleCurrentId = articleId[0]['count(*)'] + 1
@@ -26,6 +26,10 @@ router.post('/', async function(req, res, next) {
         flag = false
       })
     }
+    // 给labelArr数组前后插入一个空值
+    labelArr.push('')
+    labelArr.unshift('')
+    
     let sqlSentence2 = `insert into ll_set_article_label (article_id, label_id) values (?, ?)`
     await sqlSearch(sqlSentence2, [articleCurrentId, labelArr.join('-')]).catch(() => {
       flag = false
@@ -50,7 +54,7 @@ router.post('/', async function(req, res, next) {
       await sqlSearch('rollback;')
     }
     await res.json({ isDown: flag })
-  } else {
+  } else {    // 更改其他的博客
     articleCurrentId = req.body.id
   
     let sqlSentence6 = `update ll_articles set article_title = '${req.body.title}', article_content = '${req.body.content}', article_date = '${req.body.date}' where article_id = ${articleCurrentId}`
@@ -67,7 +71,10 @@ router.post('/', async function(req, res, next) {
         flag = false
       })
     }
-    console.log(flag + '2');
+    // 给labelArr数组前后插入一个空值
+    labelArr.push('')
+    labelArr.unshift('')
+    
     let sqlSentence8 = `update ll_set_article_label set label_id = '${labelArr.join('-')}' where article_id = '${articleCurrentId}'`
     await sqlSearch(sqlSentence8).catch(() => {
       flag = false

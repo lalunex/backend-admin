@@ -12,6 +12,7 @@ router.post('/', async function(req, res, next) {
     let cardTagNameStr = ''
     articleData.articleContentTags = []
     for(let value of labelId[0]['label_id'].split('-')) {
+      if (!value) continue
       let sqlSentence2 = `select label_name from ll_labels where label_id = ${value}`
       let cardTagName = await sqlSearch(sqlSentence2)
       articleData.articleContentTags.push(cardTagName[0]['label_name'])
